@@ -83,6 +83,18 @@ def loudnorm_2pass(src, out_wav, lufs=-16.0, true_peak=-1.5, lra=11):
     af = (f"loudnorm=I={lufs}:TP={true_peak}:LRA={lra}:measured_I={m['input_i']}:measured_TP={m['input_tp']}:"
           f"measured_LRA={m['input_lra']}:measured_thresh={m['input_thresh']}:offset={m['target_offset']}:linear=true")
     ffmpeg("-i", src, "-af", af, "-ar", str(SR), "-ac", "2", out_wav)
+    # If the true-peak ceiling capped the linear gain, close the gap with make-up gain into a
+    # transparent peak limiter (two iterations converge to within ~0.3 LU).
+    for _ in range(2):
+        got, _tp = measure_lufs(out_wav)
+        if got is None or got >= lufs - 0.4:
+            break
+        tmp = out_wav + ".tmp.wav"
+        os.replace(out_wav, tmp)
+        lim = 10 ** (true_peak / 20) * 0.97
+        ffmpeg("-i", tmp, "-af", f"volume={lufs - got:.2f}dB,alimiter=limit={lim:.4f}:attack=2:release=60:level=false",
+               "-ar", str(SR), "-ac", "2", out_wav)
+        os.remove(tmp)
     return out_wav
 
 

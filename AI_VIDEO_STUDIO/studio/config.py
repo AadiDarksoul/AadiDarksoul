@@ -15,7 +15,8 @@ SAMPLE_RATE = 48000
 
 # Character voice presets: piper voice + prosody. Pitch is in semitones (applied with ffmpeg).
 VOICES = {
-    "narrator": {"model": "en_GB-alan-medium", "length_scale": 1.12, "pitch": -1.5},
+    "narrator": {"model": "en_US-joe-medium", "length_scale": 1.08, "pitch": 0.0},  # US English narrator
+    "narrator_uk": {"model": "en_GB-alan-medium", "length_scale": 1.12, "pitch": -1.5},
     "female": {"model": "en_US-lessac-medium", "length_scale": 1.0, "pitch": 0.0},
     "male": {"model": "en_US-ryan-medium", "length_scale": 1.0, "pitch": 0.0},
     "child": {"model": "en_US-lessac-medium", "length_scale": 0.95, "pitch": 4.0},

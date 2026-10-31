@@ -2,6 +2,7 @@
 
 Style: approved cinematic stickman look (see `hook/`). Target length **8:00–8:20** (v1 was ~8:30; the flab is cut).
 Narration ≈ 1,080 words. VO = narrator ("you" = Kai). Characters: **Kai** (teal hoodie, headphones), **Tara** (8, the kid next door), **Captain Osei** (rescue lead), **Dev** (Kai's friend), **Maya** (classmate).
+**Language: US English** for all narration, dialogue and on-screen text (US spelling, feet/miles, Mom, etc.). Voices: narrator `en_US-joe-medium`, kids/boys `en_US-ryan-medium` (pitched), girls/whisper `en_US-lessac-medium`.
 
 ---
 
@@ -45,7 +46,7 @@ Narration ≈ 1,080 words. VO = narrator ("you" = Kai). Characters: **Kai** (tea
 **VO:** But first… Monday.
 
 ### 0:24 — THE RULES ("Silence was never silent")
-**VO:** Normal ears can hear down to about zero decibels. A mosquito, three metres away, in a silent room.
+**VO:** Normal ears can hear down to about zero decibels. A mosquito, ten feet away, in a silent room.
 **VO:** Yours go forty decibels lower. Ten thousand times quieter.
 *Visual: dB ladder; a tiny stickman falls past "mosquito" to "YOU: −40".*
 **VO:** And here's the wild part: your ears were already almost perfect. At their quietest, your eardrum moves less than the width of an atom.
@@ -65,18 +66,18 @@ Narration ≈ 1,080 words. VO = narrator ("you" = Kai). Characters: **Kai** (tea
 
 ### 1:10 — AMAZING ("You hear everything")
 **VO:** So what's life like at ten thousand times? Honestly? Kind of amazing.
-**VO:** You know who's at the door before they knock. Mum drags her left heel. The delivery guy jogs. The landlord tiptoes. That's how you know rent's going up.
+**VO:** You know who's at the door before they knock. Mom drags her left heel. The delivery guy jogs. The landlord tiptoes. That's how you know rent's going up.
 **VO:** In exams, you can hear every pencil in the room…
-*Visual: 30 pencils, each scratching a different-coloured ring.*
+*Visual: 30 pencils, each scratching a different-colored ring.*
 **VO:** …which is useless, because you can't tell a B from a D by sound. You tried.
 **VO:** People type their passwords right next to you. Every key clicks a little differently. That one's real: researchers trained an AI to steal passwords just from typing sounds, with about 95% accuracy. You just… don't.
-**VO:** You hear your parents whisper about your birthday present two rooms away. You practise your surprised face for a week.
+**VO:** You hear your parents whisper about your birthday present two rooms away. You practice your surprised face for a week.
 **VO:** And lies. A lie is hard work. The heart speeds up before the words even come out.
-**Mum:** "Did you finish your homework?"
+**Mom:** "Did you finish your homework?"
 **Little brother:** "Yes." *(SFX: thump-thump-THUMP)*
 **Kai:** "…He didn't."
 **Little brother:** "I hate you."
-**VO:** Then one day, Maya from class says hi…
+**VO:** Then one day, Maya from homeroom says hi…
 *SFX: her heartbeat, quick and fluttery.*
 **VO:** …and her heart skips. You're the only person on Earth who knows.
 **Kai (robotic):** "Hello. Yes. Hi."
@@ -140,7 +141,7 @@ Narration ≈ 1,080 words. VO = narrator ("you" = Kai). Characters: **Kai** (tea
 **VO:** Water dripping. Concrete settling. Your own blood, screaming. And underneath all of it…
 *Everything drops away except:* **tap-tap-tap… tap… tap.**
 **VO:** Three short. Two long.
-**Kai:** "North corner. Six metres down. She's alive."
+**Kai:** "North corner. Twenty feet down. She's alive."
 **Captain Osei:** "How could you possibly—"
 **Kai:** "She's telling me she's awake."
 *They dig. A small dusty hand holding a spoon. Tara is lifted out.*
@@ -168,7 +169,7 @@ Narration ≈ 1,080 words. VO = narrator ("you" = Kai). Characters: **Kai** (tea
 **VO:** …Tara taps goodnight.
 *Kai smiles. Then his smile freezes.*
 *SFX from far, far below: tap-tap-tap… tap… tap.* (Same rhythm. Deeper. Metallic.)
-**VO:** It came from under the city. Two hundred metres down.
+**VO:** It came from under the city. Six hundred feet down.
 **VO:** Something down there heard her too.
 *Hard cut to black.*
 
@@ -201,7 +202,7 @@ Narration ≈ 1,080 words. VO = narrator ("you" = Kai). Characters: **Kai** (tea
 2. City cross-section at night, one red ring glowing deep underground, Kai tiny on a rooftop. Text: **"SOMETHING TAPPED BACK"**
 3. Classroom: the kid's chest glowing red rings, Kai side-eyeing. Text: **"HE'S LYING"**
 
-(Keep it to 2–3 words, faces big, one bright colour accent over the muted palette.)
+(Keep it to 2–3 words, faces big, one bright color accent over the muted palette.)
 
 **Description first 2 lines** (the part shown in search):
 > What if you could hear 10,000 times better? You'd hear lies in a heartbeat, passwords in a keyboard click… and your own eyes moving.
