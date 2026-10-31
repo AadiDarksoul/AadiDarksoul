@@ -36,14 +36,14 @@ F_MONO = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf"
 
 # ------------------------------------------------------------------------------ palette (vivid)
 C = {
-    "kai": (255, 122, 0), "headphones": (0, 229, 255), "man": (123, 47, 247), "skin": (22, 26, 48),
-    "wall_top": (15, 181, 174), "wall_bot": (29, 63, 191), "floor": (255, 138, 61), "table": (224, 40, 125),
-    "sky_top": (58, 12, 163), "sky_mid": (247, 37, 133), "sky_low": (255, 158, 0),
-    "heart": (255, 40, 80), "voice": (255, 255, 255), "machine": (255, 214, 10), "nature": (60, 160, 255),
-    "title_bg": (30, 10, 90),
+    "kai": (38, 128, 122), "headphones": (52, 52, 60), "led": (255, 176, 80), "man": (112, 96, 150), "skin": (11, 11, 15),
+    "wall_top": (88, 56, 70), "wall_bot": (44, 30, 46), "floor": (74, 50, 40), "table": (64, 42, 36),
+    "sky_top": (12, 16, 30), "sky_mid": (34, 34, 60), "sky_low": (92, 60, 70),
+    "heart": (236, 96, 92), "voice": (246, 236, 214), "machine": (240, 182, 96), "nature": (140, 176, 222),
+    "title_bg": (14, 12, 18), "rim": (255, 196, 150),
 }
-ROOM_COLS = [(255, 190, 11), (251, 86, 7), (255, 0, 110), (131, 56, 236), (58, 134, 255), (6, 214, 160),
-             (17, 138, 178), (239, 71, 111), (255, 209, 102), (0, 187, 249)]
+ROOM_COLS = [(196, 146, 88), (168, 108, 72), (116, 88, 110), (78, 88, 120), (150, 118, 88), (102, 70, 82),
+             (182, 132, 84), (92, 104, 118), (140, 96, 76), (120, 110, 140)]
 
 # ------------------------------------------------------------------------------------ timeline
 T = {"cafe": 1.4, "man_line": 1.6, "vo1": 2.6, "pull": 6.0, "pull_end": 8.0, "isolate": 8.3,
@@ -98,24 +98,24 @@ def build_world():
     img = vgrad(WW, WH, C["sky_top"], C["sky_low"], C["sky_mid"])
     d = ImageDraw.Draw(img)
     # stars + moon
-    for _ in range(400):
-        x, y = rng.uniform(0, WW), rng.uniform(0, 1200)
-        r = rng.choice([1.5, 2, 3])
-        d.ellipse([x - r, y - r, x + r, y + r], fill=(255, 240, 255))
+    for _ in range(160):
+        x, y = rng.uniform(0, WW), rng.uniform(0, 1100)
+        r = rng.choice([1.2, 1.8, 2.4])
+        d.ellipse([x - r, y - r, x + r, y + r], fill=(210, 210, 225))
     glow = Image.new("RGBA", (WW, WH), (0, 0, 0, 0))
-    ImageDraw.Draw(glow).ellipse([4500, 250, 5100, 850], fill=(255, 220, 255, 140))
+    ImageDraw.Draw(glow).ellipse([4500, 250, 5100, 850], fill=(235, 225, 210, 90))
     img.alpha_composite(glow.filter(ImageFilter.GaussianBlur(120)))
-    d.ellipse([4650, 400, 4950, 700], fill=(255, 245, 230))
+    d.ellipse([4650, 400, 4950, 700], fill=(232, 226, 210))
     # far skyline
     x = 0
     while x < WW:
         bw, bh = rng.uniform(150, 350), rng.uniform(500, 1300)
-        d.rectangle([x, GROUND - bh, x + bw, GROUND], fill=(70, 20, 140))
+        d.rectangle([x, GROUND - bh, x + bw, GROUND], fill=(30, 30, 50))
         x += bw + rng.uniform(10, 60)
     # cut-away buildings (front)
     buildings = [(-50, 1050, 1300), (1100, 2750, 900), (2800, 4000, 1150), (4050, 4900, 700), (4950, 5800, 1400)]
     for bi, (x0, x1, top) in enumerate(buildings):
-        d.rectangle([x0, top, x1, GROUND], fill=(18, 14, 52))
+        d.rectangle([x0, top, x1, GROUND], fill=(20, 18, 28))
         fy = GROUND
         floor = 0
         while fy - 850 >= top - 10:
@@ -130,11 +130,11 @@ def build_world():
                 col = ROOM_COLS[int(rng.integers(len(ROOM_COLS)))]
                 room = (rx, ry0 + 30, rx + rw, fy - 20)
                 if not (bi == 1 and floor == 0) and not (bi == 2 and floor == 0):
-                    rimg = vgrad(int(rw), int(room[3] - room[1]), col, tuple(int(c * 0.55) for c in col))
+                    rimg = vgrad(int(rw), int(room[3] - room[1]), tuple(int(c * 0.7) for c in col), tuple(int(c * 0.32) for c in col))
                     img.alpha_composite(rimg, (int(rx), int(room[1])))
                     # a lamp + people
                     d.rectangle([rx + rw * 0.5 - 4, room[1], rx + rw * 0.5 + 4, room[1] + 120], fill=(30, 20, 40))
-                    d.ellipse([rx + rw * 0.5 - 40, room[1] + 110, rx + rw * 0.5 + 40, room[1] + 150], fill=(255, 250, 210))
+                    d.ellipse([rx + rw * 0.5 - 40, room[1] + 110, rx + rw * 0.5 + 40, room[1] + 150], fill=(255, 214, 150))
                     for p in range(int(rng.integers(0, 3))):
                         px = rx + rng.uniform(100, rw - 100)
                         tiny_person(d, px, room[3], ROOM_COLS[int(rng.integers(len(ROOM_COLS)))], 1.6)
@@ -150,80 +150,91 @@ def build_world():
     img.alpha_composite(vgrad(x1 - x0, y1 - y0, C["wall_top"], C["wall_bot"]), (x0, y0))
     d.rectangle([x0, 2900, x1, y1], fill=C["floor"])
     for fx in range(x0, x1, 80):
-        d.line([fx, 2900, fx - 40, y1], fill=(230, 110, 40), width=4)
+        d.line([fx, 2900, fx - 40, y1], fill=(58, 38, 30), width=4)
     # classroom: chalkboard, teacher, wall clock, pendant lamps
-    d.rounded_rectangle([1230, 2210, 2050, 2560], radius=10, fill=(120, 60, 20))
-    d.rectangle([1250, 2230, 2030, 2540], fill=(22, 128, 90))
+    d.rounded_rectangle([1230, 2210, 2050, 2560], radius=10, fill=(84, 58, 40))
+    d.rectangle([1250, 2230, 2030, 2540], fill=(38, 64, 52))
     for i, (cx, cy) in enumerate([(1330, 2300), (1480, 2380), (1640, 2290), (1800, 2420), (1900, 2320)]):
-        d.line([cx, cy, cx + 90, cy + 10 + 8 * i], fill=(230, 255, 240), width=5)
-    d.ellipse([1500, 2440, 1580, 2520], outline=(230, 255, 240), width=5)
-    tiny_person(d, 2460, 2900, (255, 0, 110), 3.2)  # teacher at the front
-    d.ellipse([2470, 2260, 2590, 2380], fill=(255, 255, 255), outline=(30, 20, 60), width=10)  # clock
+        d.line([cx, cy, cx + 90, cy + 10 + 8 * i], fill=(196, 206, 196), width=5)
+    d.ellipse([1500, 2440, 1580, 2520], outline=(196, 206, 196), width=5)
+    tiny_person(d, 2460, 2900, (150, 70, 70), 3.2)  # teacher at the front
+    d.ellipse([2470, 2260, 2590, 2380], fill=(222, 214, 196), outline=(40, 30, 30), width=10)  # clock
     d.line([2530, 2320, 2530, 2280], fill=(30, 20, 60), width=6)
     d.line([2530, 2320, 2565, 2330], fill=(30, 20, 60), width=6)
     for lx in (1500, 1920, 2340):
         d.line([lx, y0, lx, 2200], fill=(20, 20, 30), width=6)
-        d.chord([lx - 70, 2160, lx + 70, 2240], 180, 360, fill=(255, 214, 10))
+        d.chord([lx - 70, 2160, lx + 70, 2240], 180, 360, fill=(255, 200, 130))
     # table
     d.rounded_rectangle([1540, TABLE_Y - 10, 2310, TABLE_Y + 30], radius=12, fill=C["table"])
-    d.rectangle([1900, TABLE_Y + 30, 1940, 2900], fill=(150, 20, 80))
-    d.polygon([(1800, TABLE_Y - 12), (1880, TABLE_Y - 12), (1870, TABLE_Y - 40), (1810, TABLE_Y - 40)], fill=(255, 255, 255))  # papers
-    d.polygon([(1990, TABLE_Y - 12), (2070, TABLE_Y - 12), (2060, TABLE_Y - 40), (2000, TABLE_Y - 40)], fill=(255, 255, 255))
+    d.rectangle([1900, TABLE_Y + 30, 1940, 2900], fill=(44, 28, 24))
+    d.polygon([(1800, TABLE_Y - 12), (1880, TABLE_Y - 12), (1870, TABLE_Y - 40), (1810, TABLE_Y - 40)], fill=(214, 206, 190))  # papers
+    d.polygon([(1990, TABLE_Y - 12), (2070, TABLE_Y - 12), (2060, TABLE_Y - 40), (2000, TABLE_Y - 40)], fill=(214, 206, 190))
     SOURCES.append((2530, 2320, "machine", 6.3))  # ticking clock
     SOURCES.append((2460, 2560, "voice", 6.5))    # teacher
     SOURCES.append((1400, 2380, "nature", 7.3))   # fly near window
     # whisper source room (building 2 ground floor): plain hallway + door
     bx0, by0, bx1, by1 = 2830, 2150, 3970, GROUND
-    img.alpha_composite(vgrad(bx1 - bx0, by1 - by0, (6, 214, 160), (17, 90, 120)), (bx0, by0))
-    d.rectangle([3150, by0, 3180, by1], fill=(18, 14, 52))  # inner wall (the third wall)
-    d.rectangle(DOOR, fill=(120, 40, 20))
-    d.rectangle([DOOR[0] + 15, DOOR[1] + 15, DOOR[2] - 15, DOOR[3]], fill=(200, 80, 30))
-    d.ellipse([DOOR[2] - 45, 2700, DOOR[2] - 25, 2720], fill=(255, 214, 10))
+    img.alpha_composite(vgrad(bx1 - bx0, by1 - by0, (70, 82, 96), (34, 38, 50)), (bx0, by0))
+    d.rectangle([3150, by0, 3180, by1], fill=(20, 18, 28))  # inner wall (the third wall)
+    d.rectangle(DOOR, fill=(50, 32, 26))
+    d.rectangle([DOOR[0] + 15, DOOR[1] + 15, DOOR[2] - 15, DOOR[3]], fill=(96, 62, 44))
+    d.ellipse([DOOR[2] - 45, 2700, DOOR[2] - 25, 2720], fill=(220, 180, 110))
     SOURCES.append((4400, 1900, "machine", 6.8))  # phone buzzing
     # street
-    d.rectangle([0, GROUND, WW, WH], fill=(40, 10, 70))
+    d.rectangle([0, GROUND, WW, WH], fill=(18, 16, 24))
     for sx in range(0, WW, 260):
-        d.rectangle([sx, GROUND + 110, sx + 140, GROUND + 125], fill=(255, 214, 10))
+        d.rectangle([sx, GROUND + 110, sx + 140, GROUND + 122], fill=(120, 104, 80))
+    # warm light pools under each pendant lamp + low haze over the street (cinematic depth)
+    halo = Image.new("RGBA", (WW, WH), (0, 0, 0, 0))
+    hd = ImageDraw.Draw(halo)
+    for lx in (1500, 1920, 2340):
+        hd.polygon([(lx - 60, 2235), (lx + 60, 2235), (lx + 260, GROUND), (lx - 260, GROUND)], fill=(255, 200, 140, 26))
+        hd.ellipse([lx - 120, 2140, lx + 120, 2320], fill=(255, 200, 140, 70))
+    img.alpha_composite(halo.filter(ImageFilter.GaussianBlur(40)))
+    haze = vgrad(WW, 700, (0, 0, 0), (120, 100, 110))
+    haze.putalpha(Image.linear_gradient("L").resize((WW, 700)).point(lambda v: int(v * 0.35)))
+    img.alpha_composite(haze, (0, GROUND - 600))
     return img
 
 
 # ------------------------------------------------------------------------------- characters
 def seated(d, x, y, s, hoodie, facing, wide=False, headphones=False, smile=False, look=0.0):
-    """Original seated stick character drawn in screen space (x,y = point on table under chest)."""
-    hx, hy, r = x, y - 270 * s, 58 * s
-    # hood + torso
-    d.rounded_rectangle([x - 52 * s, y - 205 * s, x + 52 * s, y + 10 * s], radius=28 * s, fill=hoodie)
-    d.chord([x - 70 * s, y - 250 * s, x + 70 * s, y - 150 * s], 180, 360, fill=tuple(int(c * 0.8) for c in hoodie))
-    # arm on table
-    d.line([x + facing * 20 * s, y - 170 * s, x + facing * 95 * s, y - 40 * s, x + facing * 150 * s, y - 25 * s],
-           fill=hoodie, width=int(30 * s), joint="curve")
-    d.ellipse([x + facing * 150 * s - 16 * s, y - 41 * s, x + facing * 150 * s + 16 * s, y - 9 * s], fill=C["skin"])
-    # head
+    """Seated stick character: black round head, ring eyes, thin limbs, colour only on the hoodie."""
+    hx, hy, r = x + facing * 6 * s, y - 285 * s, 62 * s
+    dark = tuple(int(c * 0.72) for c in hoodie)
+    # hoodie torso (slight slouch) + hood behind the neck
+    d.polygon([(x - 46 * s, y - 210 * s), (x + 46 * s, y - 210 * s), (x + 58 * s, y + 10 * s), (x - 58 * s, y + 10 * s)], fill=hoodie)
+    d.chord([x - 60 * s, y - 248 * s, x + 60 * s, y - 172 * s], 180, 360, fill=dark)
+    # arm (sleeve) resting on the desk, black hand
+    d.line([x + facing * 22 * s, y - 185 * s, x + facing * 88 * s, y - 70 * s, x + facing * 150 * s, y - 32 * s],
+           fill=hoodie, width=int(24 * s), joint="curve")
+    d.ellipse([x + facing * 150 * s - 13 * s, y - 45 * s, x + facing * 150 * s + 13 * s, y - 19 * s], fill=C["skin"])
     d.ellipse([hx - r, hy - r, hx + r, hy + r], fill=C["skin"])
-    if headphones:  # cyan cups resting around the neck
-        d.arc([hx - 70 * s, hy + 20 * s, hx + 70 * s, hy + 130 * s], 20, 160, fill=C["headphones"], width=int(12 * s))
+    if headphones:
+        d.arc([hx - r * 1.08, hy + r * 0.25, hx + r * 1.08, hy + r * 1.9], 15, 165, fill=C["headphones"], width=int(11 * s))
         for side in (-1, 1):
-            cx = hx + side * 64 * s
-            d.rounded_rectangle([cx - 18 * s, hy + 50 * s, cx + 18 * s, hy + 100 * s], radius=10 * s, fill=C["headphones"])
-        # hair tuft (Kai's silhouette mark)
-        d.polygon([(hx - 20 * s, hy - r + 6 * s), (hx + 5 * s, hy - r - 30 * s), (hx + 15 * s, hy - r + 4 * s)], fill=C["skin"])
-    # eyes
-    ew, eh = (16 * s, 22 * s) if not wide else (21 * s, 30 * s)
-    for k, ox in enumerate((-14, 22)):
-        ex = hx + facing * ox * s + facing * 6 * s
-        ey = hy - 8 * s
-        d.ellipse([ex - ew, ey - eh, ex + ew, ey + eh], fill=(255, 255, 255))
-        pr = 8 * s if not wide else 6 * s
-        px = ex + facing * (5 + look * 8) * s
-        d.ellipse([px - pr, ey - pr, px + pr, ey + pr], fill=(10, 10, 20))
+            cx = hx + side * r * 0.98
+            d.rounded_rectangle([cx - 15 * s, hy + r * 0.85, cx + 15 * s, hy + r * 1.55], radius=9 * s, fill=C["headphones"])
+            d.ellipse([cx - 4 * s, hy + r * 1.15, cx + 4 * s, hy + r * 1.25], fill=C["led"])
+        d.polygon([(hx - 24 * s, hy - r + 8 * s), (hx - 2 * s, hy - r - 26 * s), (hx + 14 * s, hy - r + 6 * s)], fill=C["skin"])
+    # ring eyes: white outline, dark centre, small highlight that looks where the character looks
+    er = (17 if not wide else 22) * s
+    for ox in (-6, 30):
+        ex, ey = hx + facing * ox * s, hy - 6 * s
+        d.ellipse([ex - er, ey - er, ex + er, ey + er], fill=C["skin"], outline=(245, 242, 236), width=max(2, int(6 * s)))
+        pr = (5 if not wide else 4) * s
+        px = ex + facing * (3 + look * 6) * s
+        d.ellipse([px - pr, ey - pr, px + pr, ey + pr], fill=(245, 242, 236))
+    mx = hx + facing * 16 * s
     if smile:
-        d.arc([hx + facing * 4 * s - 22 * s, hy + 12 * s, hx + facing * 4 * s + 22 * s, hy + 36 * s], 20, 160,
-              fill=(255, 255, 255), width=int(5 * s))
+        d.arc([mx - 20 * s, hy + 14 * s, mx + 20 * s, hy + 40 * s], 15, 165, fill=(245, 242, 236), width=max(2, int(5 * s)))
     elif wide:
-        d.ellipse([hx + facing * 8 * s - 8 * s, hy + 22 * s, hx + facing * 8 * s + 8 * s, hy + 40 * s], fill=(255, 255, 255))
+        d.ellipse([mx - 7 * s, hy + 26 * s, mx + 7 * s, hy + 42 * s], outline=(245, 242, 236), width=max(2, int(4 * s)))
 
 
 def rings(d, cx, cy, col, t, speed, maxr, n=4, width=6, alpha=1.0, inward=False):
+    alpha *= 0.85
+    width = max(2, width * 0.7)
     for i in range(n):
         ph = (t * speed + i / n) % 1.0
         r = (1 - ph) * maxr if inward else ph * maxr
@@ -272,20 +283,21 @@ def frame(fi):
     k = W / 1920
     if t < T["cafe"]:  # ---------------- S1: ear close-up
         z = 1 + 0.05 * t / T["cafe"]
-        bg = vgrad(W, H, (255, 0, 110), (255, 158, 0))
+        bg = vgrad(W, H, (70, 44, 56), (128, 84, 62))
         bd = ImageDraw.Draw(bg)
         rng = np.random.default_rng(3)
         for _ in range(28):  # café bokeh
             x, y, r = rng.uniform(0, W), rng.uniform(0, H), rng.uniform(30, 110) * k
-            bd.ellipse([x - r, y - r, x + r, y + r], fill=tuple(int(c) for c in ROOM_COLS[int(rng.integers(10))]) + (140,))
+            bd.ellipse([x - r, y - r, x + r, y + r], fill=(255, 200, 140, int(rng.uniform(40, 110))))
         base = bg.filter(ImageFilter.GaussianBlur(18 * k))
         d = ImageDraw.Draw(base)
         hx, hy, hr = W * 0.78, H * 0.55, 620 * k * z
         d.ellipse([hx - hr, hy - hr, hx + hr, hy + hr], fill=C["skin"])
         ex, ey = hx - hr * 0.86, hy - 20 * k
-        d.ellipse([ex - 70 * k * z, ey - 110 * k * z, ex + 70 * k * z, ey + 110 * k * z], fill=(40, 46, 80))
-        gd.arc([ex - 70 * k * z, ey - 110 * k * z, ex + 70 * k * z, ey + 110 * k * z], 90, 300, fill=C["headphones"] + (255,), width=int(8 * k))
-        gd.arc([ex - 35 * k * z, ey - 60 * k * z, ex + 35 * k * z, ey + 60 * k * z], 100, 280, fill=C["headphones"] + (200,), width=int(5 * k))
+        d.ellipse([ex - 70 * k * z, ey - 110 * k * z, ex + 70 * k * z, ey + 110 * k * z], fill=(26, 24, 30))
+        gd.arc([ex - 70 * k * z, ey - 110 * k * z, ex + 70 * k * z, ey + 110 * k * z], 90, 300, fill=C["rim"] + (230,), width=int(6 * k))
+        gd.arc([hx - hr, hy - hr, hx + hr, hy + hr], 150, 250, fill=C["rim"] + (200,), width=int(7 * k))
+        gd.arc([ex - 35 * k * z, ey - 60 * k * z, ex + 35 * k * z, ey + 60 * k * z], 100, 280, fill=C["rim"] + (150,), width=int(4 * k))
         rings(gd, ex, ey, C["heart"], t, 112 / 60, 900 * k, n=5, width=10 * k, inward=True)
         hud(gd, k, t, "♥ HEART RATE  112 ↑", C["heart"])
     elif t < T["kai_close"]:  # ------- S2/S3: café → pull back to city cross-section
@@ -300,7 +312,7 @@ def frame(fi):
         seated(d, mx, my, s, C["man"], 1, smile=t < T["vo1"] + 1.5)
         kx, ky, _ = to_screen(box, *KAI)
         seated(d, kx, ky, s, C["kai"], -1, headphones=True)
-        rim_light(chars, glow, (255, 190, 120), s)
+        rim_light(chars, glow, C["rim"], s)
         base.alpha_composite(chars)
         d = ImageDraw.Draw(base)
         # man's lying heart
@@ -341,7 +353,7 @@ def frame(fi):
         jolt = 6 * s * math.exp(-max(0, t - T["kai_close"] - 0.35) * 12) if turned else 0
         chars = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         seated(ImageDraw.Draw(chars), kx, ky - jolt, s, C["kai"], 1 if turned else -1, wide=turned, headphones=True, look=0.6)
-        rim_light(chars, glow, (200, 240, 255), s)
+        rim_light(chars, glow, C["rim"], s, dx=1)
         base.alpha_composite(chars)
         px, py, _ = to_screen(box, 3510, 2650)
         rings(gd, px, py, C["voice"], t, 0.7, 1500 * s, n=5, width=8 * s)
@@ -350,47 +362,54 @@ def frame(fi):
         pass
     else:  # ------------------------------ title card
         tt = t - T["title"]
-        base = vgrad(W, H, C["title_bg"], (90, 10, 120))
+        base = vgrad(W, H, C["title_bg"], (30, 24, 34))
+        rays = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        rd = ImageDraw.Draw(rays)
+        for i in range(18):
+            ang = i / 18 * 2 * math.pi + tt * 0.05
+            rd.line([W / 2, H / 2, W / 2 + math.cos(ang) * W, H / 2 + math.sin(ang) * W], fill=(200, 220, 255, 26), width=int(30 * k))
+        glow.alpha_composite(rays.filter(ImageFilter.GaussianBlur(25 * k)))
         d = ImageDraw.Draw(base)
-        f1 = ImageFont.truetype(F_BOLD, int(92 * k))
-        f2 = ImageFont.truetype(F_BOLD, int(150 * k))
+        f1 = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf", int(78 * k))
+        f2 = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf", int(140 * k))
         a = ease(tt / 0.35)
         l1, l2 = "WHAT IF YOU COULD HEAR", "10,000× BETTER?"
         b1, b2 = d.textbbox((0, 0), l1, font=f1), d.textbbox((0, 0), l2, font=f2)
         y1 = H * 0.30
         x1 = (W - b1[2]) / 2
-        d.text((x1, y1), l1, font=f1, fill=(255, 255, 255, int(255 * a)))
+        gd.text((x1, y1), l1, font=f1, fill=(236, 240, 248, int(235 * a)))
         sc = 1 + 0.06 * (1 - ease(tt / 0.5))
         gd.text(((W - b2[2] * sc) / 2 + (b2[2] * (sc - 1)) / 2, y1 + 130 * k), l2, font=f2,
-                fill=C["headphones"] + (int(255 * a),))
+                fill=(190, 226, 255, int(255 * a)))
         yb = d.textbbox((x1, y1), "WHAT IF ", font=f1)
         yw = d.textbbox((0, 0), "YOU", font=f1)
         ox = yb[2] + yw[2] * 0.55
         oy = y1 + yw[3] * 0.6
         r = tt * 900 * k
-        gd.ellipse([ox - r, oy - r, ox + r, oy + r], outline=C["kai"] + (int(255 * max(0, 1 - tt / 1.6)),), width=int(10 * k))
+        gd.ellipse([ox - r, oy - r, ox + r, oy + r], outline=(190, 226, 255, int(200 * max(0, 1 - tt / 1.6))), width=int(6 * k))
         if tt > 0.4:
-            rings(gd, ox, oy, C["kai"], tt, 0.6, 700 * k, n=3, width=5 * k, alpha=0.5)
+            rings(gd, ox, oy, (190, 226, 255), tt, 0.6, 700 * k, n=3, width=5 * k, alpha=0.4)
     return composite(base, glow)
 
 
-def rim_light(chars, glow, col, s):
-    """Thin glowing outline around characters (adds depth; goes to the HDR emissive layer)."""
-    a = chars.getchannel("A")
-    size = max(3, int(5 * s) | 1)
-    edge = Image.eval(Image.fromarray(np.clip(np.asarray(a.filter(ImageFilter.MaxFilter(size)), np.int16)
-                                              - np.asarray(a, np.int16), 0, 255).astype(np.uint8)), lambda v: int(v * 0.55))
-    layer = Image.new("RGBA", chars.size, col + (0,))
-    layer.putalpha(edge)
+def rim_light(chars, glow, col, s, dx=-1, dy=-1):
+    """Warm crescent rim on the side facing the key light (light from upper-left by default)."""
+    a = np.asarray(chars.getchannel("A"), np.int16)
+    off = max(2, int(5 * s))
+    shifted = np.roll(np.roll(a, -dy * off, axis=0), -dx * off, axis=1)
+    edge = np.clip(a - shifted, 0, 255).astype(np.uint8)
+    layer = Image.new("RGBA", chars.size, C["rim"] + (0,))
+    layer.putalpha(Image.fromarray(edge).filter(ImageFilter.GaussianBlur(1.2)).point(lambda v: int(v * 0.8)))
     glow.alpha_composite(layer)
 
 
 def hud(gd, k, t, text, col):
     f = ImageFont.truetype(F_MONO, int(30 * k))
     blink = 1.0 if int(t * 3) % 6 else 0.6
-    gd.rounded_rectangle([40 * k, 36 * k, 40 * k + 14 * k * len(text) + 80 * k, 96 * k], radius=12 * k,
-                         outline=col + (int(200 * blink),), width=int(3 * k))
-    gd.text((60 * k, 46 * k), text, font=f, fill=col + (int(255 * blink),))
+    y0 = H * 0.06 + 22 * k  # sit below the letterbox bar
+    gd.rounded_rectangle([40 * k, y0, 40 * k + 18 * k * len(text) + 40 * k, y0 + 54 * k], radius=10 * k,
+                         outline=col + (int(170 * blink),), width=int(2 * k))
+    gd.text((60 * k, y0 + 10 * k), text, font=f, fill=col + (int(230 * blink),))
 
 
 # ----------------------------------------------------------------------------- colour science
@@ -407,6 +426,21 @@ def pq(nits):
     return ((c1 + c2 * y) / (1 + c3 * y)) ** m2
 
 
+_VIG = None
+
+
+def finish(x, rng_seed):
+    """Vignette + fine grain; caller applies letterbox."""
+    global _VIG
+    if _VIG is None:
+        yy, xx = np.mgrid[0:H, 0:W]
+        r = np.sqrt(((xx - W / 2) / (W / 2)) ** 2 + ((yy - H / 2) / (H / 2)) ** 2)
+        _VIG = np.clip(1 - 0.55 * np.clip(r - 0.45, 0, None) ** 1.6, 0, 1).astype(np.float32)[..., None]
+    g = np.random.default_rng(rng_seed).normal(0, 0.012, (H // 2, W // 2)).astype(np.float32)
+    g = np.repeat(np.repeat(g, 2, 0), 2, 1)[:H, :W, None]
+    return np.clip(x * _VIG + g, 0, None)
+
+
 def composite(base, glow):
     b = np.asarray(base.convert("RGB"), np.float32) / 255.0
     g = np.asarray(glow, np.float32) / 255.0
@@ -415,12 +449,20 @@ def composite(base, glow):
     ba = bloom[..., :3] * bloom[..., 3:4]
     emissive = ga + ba * 1.6
     # SDR: screen-add emissive on top of base, slight vibrance boost
+    seed = int(b[::97, ::89].sum() * 1000) % 100000
+    b = finish(b, seed)
+    emissive = emissive * _VIG
     sdr = 1 - (1 - b) * (1 - np.clip(emissive, 0, 1))
     sdr8 = (np.clip(sdr, 0, 1) * 255 + 0.5).astype(np.uint8)
     # HDR10: diffuse at 203 nits, emissive highlights up to ~850 nits, BT.709 -> BT.2020, PQ, 16-bit
     lin = srgb_to_lin(b) * 203.0 + srgb_to_lin(np.clip(emissive, 0, 1.5)) * 650.0
     lin2020 = lin @ M709_2020.T
     hdr16 = (pq(lin2020) * 65535 + 0.5).astype(np.uint16)
+    bar = int(H * 0.06)  # cinematic letterbox
+    sdr8[:bar] = 0
+    sdr8[-bar:] = 0
+    hdr16[:bar] = 0
+    hdr16[-bar:] = 0
     return sdr8.tobytes(), hdr16.tobytes()
 
 
