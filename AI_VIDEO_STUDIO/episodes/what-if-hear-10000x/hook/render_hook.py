@@ -428,10 +428,16 @@ def composite(base, glow):
 def build_audio(path):
     tmp = os.path.join(OUT, "tmp")
     os.makedirs(tmp, exist_ok=True)
-    man, d_man, _ = tts.speak("It wasn't me.", os.path.join(tmp, "man.wav"), {"preset": "male", "pitch": 2.5})
-    vo1, d1, e1 = tts.speak("He says it wasn't him. His heart just told you... it was.", os.path.join(tmp, "vo1.wav"), "narrator")
-    wsp, dw, _ = tts.speak("Kai?", os.path.join(tmp, "whisper.wav"), {"preset": "whisper", "gain_db": 2})
-    vo3, d3, _ = tts.speak("And through three walls... someone just whispered your name.", os.path.join(tmp, "vo3.wav"), "narrator")
+    def speak(text, path, voice):
+        if os.path.exists(path):  # reuse: Piper is stochastic, cached lines keep picture/sound in sync
+            from studio.media import duration
+            return path, duration(path), "cached"
+        return tts.speak(text, path, voice)
+
+    man, d_man, _ = speak("It wasn't me.", os.path.join(tmp, "man.wav"), {"preset": "male", "pitch": 2.5})
+    vo1, d1, e1 = speak("He says it wasn't him. His heart just told you... it was.", os.path.join(tmp, "vo1.wav"), "narrator")
+    wsp, dw, _ = speak("Kai?", os.path.join(tmp, "whisper.wav"), {"preset": "whisper", "gain_db": 2})
+    vo3, d3, _ = speak("And through three walls... someone just whispered your name.", os.path.join(tmp, "vo3.wav"), "narrator")
     T["vo3"] = max(T["vo3"], T["vo1"] + d1 + 0.2)
     T["silence"] = T["vo3"] + d3 + 0.25
     T["title"] = T["silence"] + 0.8
@@ -464,7 +470,26 @@ def build_audio(path):
     tl.add(synth.whispers(1.2, rng), 7.0, "ambience", gain_db=-12, fade_out=0.3)
     # isolate: everything ducks, the whisper (close, right side)
     tl.add(wsp, T["whisper"], "dialogue", gain_db=-3, pan=0.65)
-    tl.add(synth.drone(T["silence"] - T["isolate"] + 0.1, base=55.0), T["isolate"], "music", gain_db=-6, fade_in=0.4)
+    # ---- BGM: soft but engaging, original score (stems automated per section)
+    from studio.music import soft_engaging_stems
+    stems = soft_engaging_stems(dur, bpm=112, key="D", seed=11)  # 112 bpm locks to the heartbeat
+    tax = np.arange(int(dur * SR)) / SR
+
+    def env(points):  # piecewise-linear gain (dB) over time; -90 = off
+        ts, dbs = zip(*points)
+        return (10 ** (np.interp(tax, ts, dbs) / 20)).astype(np.float32)[:, None]
+
+    off = -90
+    si, ti, iso, pu = T["silence"], T["title"], T["isolate"], T["pull"]
+    automation = {
+        "pad":      [(0, -14), (1.4, -8), (pu, -7), (iso, -6), (si - 0.05, -8), (si, off), (ti, off), (ti + 0.05, -5), (dur, -6)],
+        "piano":    [(0, off), (0.3, -12), (1.4, -6), (pu, -5), (iso, -14), (iso + 0.6, off), (ti + 0.3, off), (ti + 0.6, -6), (dur, -6)],
+        "piano_hi": [(0, off), (pu - 0.2, off), (pu + 0.4, -9), (iso, -12), (iso + 0.4, off), (dur, off)],
+        "pulse":    [(0, off), (1.4, -10), (pu, -8), (iso, -12), (si - 0.05, -14), (si, off), (ti + 0.6, off), (ti + 1.0, -10), (dur, -10)],
+        "shaker":   [(0, off), (1.6, -14), (pu, -10), (iso, off), (ti + 1.0, off), (ti + 1.4, -14), (dur, -14)],
+    }
+    bgm = sum(stems[k] * env(v) for k, v in automation.items())
+    tl.add(bgm, 0.0, "music", gain_db=0)
     tl.add(vo3, T["vo3"], "dialogue")
     # title: clean high tone + headphone "pressure drop"
     tt = np.arange(int(3.0 * SR)) / SR
@@ -472,7 +497,7 @@ def build_audio(path):
     tl.add(synth.reverb(tone.astype(np.float32), 2.5, 0.4), T["title"], "sfx", gain_db=-6)
     drop = synth.band(synth.noise(int(1.2 * SR), "brown", rng), None, 300, 2) * np.linspace(1, 0, int(1.2 * SR)) ** 2
     tl.add(drop * 0.8, T["title"] + 2.1, "sfx", gain_db=-6)
-    tl.render(path, duck_db=-12, lufs=-14.0, true_peak=-1.0)
+    tl.render(path, duck_db=-7, bus_gain={"music": -7.0}, lufs=-14.0, true_peak=-1.0)
     # enforce the digital silence window exactly
     a = load(path)
     s0, s1 = int(T["silence"] * SR), int(T["title"] * SR)
@@ -483,7 +508,21 @@ def build_audio(path):
 
 
 # --------------------------------------------------------------------------------------- main
+def remux_audio_only():
+    wav = os.path.join(OUT, "hook_mix.wav")
+    build_audio(wav)
+    for name in ("hook_SDR.mp4", "hook_HDR10.mp4"):
+        src, tmp = os.path.join(OUT, name), os.path.join(OUT, "tmp_" + name)
+        ffmpeg("-i", src, "-i", wav, "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "320k",
+               "-ar", "48000", "-ac", "2", "-movflags", "+faststart", "-shortest", tmp)
+        os.replace(tmp, src)
+        print(describe(src))
+    print("[audio] integrated LUFS / true peak:", mix.measure_lufs(os.path.join(OUT, "hook_SDR.mp4")))
+
+
 def main():
+    if "--audio-only" in sys.argv:
+        return remux_audio_only()
     wav = os.path.join(OUT, "hook_mix.wav")
     dur = build_audio(wav)
     n = int(round(dur * FPS))

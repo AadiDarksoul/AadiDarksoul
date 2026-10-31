@@ -126,3 +126,76 @@ def score(mood="horror", dur=60.0, key="Am", seed=0, intensity_curve=None):
     fade = np.minimum(1, np.minimum(np.arange(n) / (2 * SR), (n - np.arange(n)) / (3 * SR)))
     out = np.stack([L * fade, R * fade], axis=1)
     return norm(out, 0.8)
+
+
+# ------------------------------------------------------------------- soft & engaging bed (stems)
+def soft_engaging_stems(dur, bpm=112, key="D", seed=0):
+    """Soft but moving background score as separate stems so a mix can automate each one.
+
+    Felt-piano 8th-note arpeggios over warm pads, a gentle half-time sub pulse (heartbeat feel)
+    and a quiet shaker. Progression i(add9) - VI(maj7) - III - VII: curious, hopeful-mysterious.
+    Returns dict of stereo float32 arrays: pad, piano, piano_hi, pulse, shaker.
+    """
+    rng = np.random.default_rng(seed)
+    n = int(dur * SR)
+    beat = 60.0 / bpm
+    bar = beat * 4
+    root = 50 + NOTE[key]  # D3
+    # chord tones as semitone offsets from root (D minor: Dm9, Bbmaj7, F, C)
+    chords = [[0, 7, 14, 15, 19], [-4, 3, 7, 10, 14], [3, 10, 15, 19, 22], [-2, 5, 10, 14, 17]]
+    stems = {k: np.zeros((n, 2), np.float32) for k in ("pad", "piano", "piano_hi", "pulse", "shaker")}
+
+    def felt(f, length, vel):
+        m = int(length * SR)
+        t = np.arange(m) / SR
+        s = sum(np.sin(2 * np.pi * f * h * t) * np.exp(-t * (2.2 + h * 1.4)) / h ** 1.5 for h in range(1, 5))
+        s = s * np.minimum(1, t / 0.008) * vel
+        return band(s.astype(np.float32), None, 2800, 2)
+
+    def put(stem, sig, start, pan=0.0):
+        i = int(start * SR)
+        if i >= n:
+            return
+        m = min(len(sig), n - i)
+        a = (pan + 1) * np.pi / 4
+        stems[stem][i:i + m, 0] += sig[:m] * np.cos(a)
+        stems[stem][i:i + m, 1] += sig[:m] * np.sin(a)
+
+    pattern = [0, 1, 2, 3, 1, 2, 4, 2]
+    t0, ci = 0.0, 0
+    while t0 < dur:
+        ch = chords[ci % len(chords)]
+        seg = min(bar + 0.6, dur - t0)
+        if seg > 0.1:
+            p = _pad([hz(root + c - 12) for c in ch[:3]], int(seg * SR), rng, 1100) * 0.55
+            put("pad", p, t0, -0.15)
+            put("pad", np.roll(p, int(0.013 * SR)), t0, 0.15)
+        for k in range(8):  # 8th-note arpeggio
+            st = t0 + k * beat / 2
+            if st >= dur:
+                break
+            note = root + ch[pattern[k] % len(ch)]
+            vel = (0.55 if k % 2 else 0.8) * rng.uniform(0.85, 1.0)
+            put("piano", felt(hz(note), 1.6, vel) * 0.35, st + rng.uniform(0, 0.008), rng.uniform(-0.35, 0.35))
+        for k in range(16):  # 16th sparkle, one octave up (used in lifts)
+            st = t0 + k * beat / 4
+            if st < dur and rng.random() < 0.7:
+                note = root + 12 + ch[(k * 3) % len(ch)]
+                put("piano_hi", felt(hz(note), 0.9, 0.5) * 0.18, st, rng.uniform(-0.7, 0.7))
+        for k in (0, 2):  # half-time sub pulse
+            st = t0 + k * beat
+            L = int(0.35 * SR)
+            tt = np.arange(L) / SR
+            kick = np.sin(2 * np.pi * (48 + 40 * np.exp(-tt * 30)) * tt) * np.exp(-tt * 9) * 0.5
+            put("pulse", kick.astype(np.float32), st)
+        for k in range(8):  # soft shaker, accent on off-beats
+            st = t0 + k * beat / 2
+            L = int(0.07 * SR)
+            sh = band(rng.standard_normal(L).astype(np.float32), 5000, 11000, 2) * np.exp(-np.arange(L) / (0.015 * SR))
+            put("shaker", sh * (0.10 if k % 2 else 0.05), st, 0.3)
+        t0 += bar
+        ci += 1
+    for k in ("pad", "piano", "piano_hi"):
+        stems[k][:, 0] = reverb(stems[k][:, 0], 2.6, 0.32, np.random.default_rng(seed + 3))
+        stems[k][:, 1] = reverb(stems[k][:, 1], 2.7, 0.32, np.random.default_rng(seed + 4))
+    return stems
