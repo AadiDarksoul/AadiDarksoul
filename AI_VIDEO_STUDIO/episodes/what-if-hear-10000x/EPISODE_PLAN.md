@@ -20,6 +20,23 @@ Limitation: YouTube blocked downloading the actual video/audio from the server, 
 | Structure | power demo → rules → "amazing and awful" list → emotional turn (mom) → villain → payoff → cliffhanger | in-medias-res → flashback → numbered tests → cost → twist (mentor burning out) → "is it real?" → cliffhanger | ominous cold open → threat → "how he built it" explainer → hunt → twist → cliffhanger |
 | "[music]" tags in subtitles | 58 of 213 lines | 40 of 170 | 36 of 171 |
 
+### A2 — Measured from the creator's screen recordings (first 38–44 s of "500 IQ to Disappear" and "Reaction Time 10x Faster")
+| Metric | 500 IQ to Disappear | Reaction Time 10x | What we do instead |
+|---|---|---|---|
+| First sound / first VO word | **0.9 s of digital silence**, VO at 1.1 s | 0.7 s silence, VO at 1.0 s | Sound (heartbeat) at **frame 0**, first line at 1.6 s |
+| Premise stated in VO | 20 s | 35 s | **12 s** |
+| Title card | ~30 s (glow serif "WHAT IF YOU HAD 500 IQ?") | ~35–39 s | ~13.5 s |
+| Average shot length (visual count) | ~2.1 s (many slow pushes/dissolves) | ~2.6 s | 2–3 s, but cuts on sound hits |
+| Music/SFX bed vs voice | gaps only **~3 dB** below speech | ~4 dB below | Bed **10–12 dB** under VO, ducked |
+| Loudness range (LRA) | **3.7 LU** (very compressed, constant) | 5.8 LU | Wider dynamics + 3 planned silences |
+| Silences after the open | one ~0.9 s gap at 24.5 s | none | 3 deliberate silences (0.8 s, 1 s, 2 s) |
+| VO pace | ~2.6 words/s with long pauses between lines | ~2 words/s | similar, slightly tighter |
+(Absolute loudness can't be measured from a phone screen recording because it depends on device volume. The ratios above are reliable.)
+
+**Visual techniques seen and worth adopting (in our own style):** warm **rim light** outlining characters, **shallow depth of field** (blurred backgrounds in close-ups), extreme close-ups of tiny props (fly on a cup, hand), top-down shots, small HUD timers ("0.25 s → 0.025 s"), story text as lower-thirds, glowing title typography over the establishing shot.
+
+**Similarity warning:** the Reaction-Time cold open is two characters at a **café table**. Our first hook draft was also a café, so the opening has been **moved to a classroom** ("It wasn't me.") to stay clearly original.
+
 ### What they do well (keep these)
 1. **Second-person narration ("You…")** in short, punchy, declarative lines. The viewer *is* the character.
 2. **Cold open on the power's most visual demo**, before any explanation (battery, bullet, cameras).
@@ -68,9 +85,9 @@ Goals: a readable image in 1 second on a phone, motion plus sound from frame 1, 
 | Time | Picture | Sound | Text on screen |
 |---|---|---|---|
 | 0:00.0 | **Extreme close-up: Kai's ear**, and a red ring of light pulses into it. No black frame. | Muffled, irregular heartbeat *thump-thump… thump* (not his) | `HEART RATE 112 ↑` (small audio-HUD, top-left) |
-| 0:01.5 | Smash-cut wide: café. A man across the table smiles: "I'm fine." Red rings come from his chest. | Heartbeat spikes; café sounds are muffled | — |
-| 0:03 | VO line 1 starts. Camera pushes in on the man's chest; the rings speed up. | **VO:** "He says he's fine. His heart just told you he's lying." | — |
-| 0:05 | Camera pulls back FAST through the café wall into a city **cross-section**: dozens of coloured rings (yellow machines, white voices, red hearts) | Layers pop in **panned in 3D**: a coffee grinder two streets away, a phone vibrating in a pocket, a fly's wings | — |
+| 0:01.5 | Smash-cut: classroom. The kid next to Kai smiles: "It wasn't me." Red rings come from his chest. | Heartbeat spikes; classroom murmur is muffled | — |
+| 0:03 | VO line 1 starts. Camera pushes in on the kid's chest; the rings speed up. | **VO:** "He says it wasn't him. His heart just told you… it was." | — |
+| 0:05 | Camera pulls back FAST through the classroom wall into a city **cross-section**: dozens of coloured rings (yellow machines, white voices, red hearts) | Layers pop in **panned in 3D**: a coffee grinder two streets away, a phone vibrating in a pocket, a fly's wings | — |
 | 0:08 | Rings fade except **one white ring** from behind an apartment door | Everything ducks. A whisper, close and left: *"…Kai…"* | — |
 | 0:09 | Kai freezes and turns his head toward the camera | **VO:** "And through three walls, someone just whispered your name." | — |
 | 0:11 | Hard cut to black | **Total silence (0.8 s), silence #1** | — |
@@ -84,8 +101,8 @@ Why this beats the references: the premise is *shown* in 1.5 s and *said* by 0:1
 ## PART D — Full script (narration = VO, dialogue in quotes)
 
 ### 0:00 · COLD OPEN — "Someone said your name"
-*(as in Part C)*
-**VO:** He says he's fine. His heart just told you he's lying.
+*(as in Part C; rendered style test: `hook/render_hook.py` → `hook/out/hook_HDR10.mp4` + `hook_SDR.mp4`)*
+**VO:** He says it wasn't him. His heart just told you… it was.
 **VO:** You can hear a coffee grinder two streets away. A phone buzzing in a stranger's pocket. A fly changing its mind.
 **VO:** And through three walls, someone just whispered your name.
 *[SILENCE] [TITLE]*
