@@ -1,5 +1,7 @@
 # What If You Could Hear 10,000x Better? — Episode Plan
 
+> **Superseded for production by `SCRIPT_v2.md`** (retention cut: flash-forward, headphone test, re-hooks, new cliffhanger, binary-choice CTA, Shorts funnel). This file keeps the analysis and the style/sound spec.
+
 Reference analysis + full script + sound/animation/retention spec.
 Target: 8:30–9:00 · 1920×1080 · stickman/flat-vector style · ~1,100 words of narration (~130 wpm).
 
